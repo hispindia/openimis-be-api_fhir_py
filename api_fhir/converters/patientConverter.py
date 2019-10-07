@@ -23,7 +23,7 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
         cls.build_fhir_marital_status(fhir_patient, imis_insuree)
         cls.build_fhir_telecom(fhir_patient, imis_insuree)
         cls.build_fhir_addresses(fhir_patient, imis_insuree)
-        cls.build_fhir_extentions(fhir_patient, imis_insuree)
+        cls.build_fhir_extensions(fhir_patient, imis_insuree)
 
         return fhir_patient
 
@@ -227,7 +227,7 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
                     imis_insuree.geolocation = address.text
 
     @classmethod
-    def build_fhir_extentions(cls, imis_insuree, fhir_patient):
+    def build_fhir_extensions(cls, imis_insuree, fhir_patient):
         imis_insuree.extension = []
 
         def build_extension_isHead( imis_insuree, fhir_patient):
