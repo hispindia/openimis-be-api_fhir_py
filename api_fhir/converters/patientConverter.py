@@ -13,6 +13,7 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
 
     @classmethod
     def to_fhir_obj(cls, imis_insuree):
+
         fhir_patient = Patient()
         cls.build_fhir_pk(fhir_patient, imis_insuree.id)
         cls.build_human_names(fhir_patient, imis_insuree)
@@ -125,8 +126,8 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
 
     @classmethod
     def build_fhir_gender(cls, fhir_patient, imis_insuree):
-        if hasattr(imis_insuree, "gender") and imis_insuree.gender is not None:
-            code = imis_insuree.gender.code
+        if hasattr(imis_insuree, "gender_id") and imis_insuree.gender_id is not None:
+            code = imis_insuree.gender_id
             if code == GeneralConfiguration.get_male_gender_code():
                 fhir_patient.gender = AdministrativeGender.MALE.value
             elif code == GeneralConfiguration.get_female_gender_code():
