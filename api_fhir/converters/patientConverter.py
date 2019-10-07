@@ -229,22 +229,26 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
     @classmethod
     def build_fhir_extentions(cls, imis_insuree, fhir_patient):
         imis_insuree.extension = []
-        #import pdb; pdb.set_trace()
 
         def build_extention_isHead( imis_insuree, fhir_patient):
+            if not hasattr(fhir_patient,'head'):
+                return
+            
             extension = Extension()
             extension.url = "http://hispindia.org/fhir/StructureDefinition/isHead"
             extension.valueBoolean = fhir_patient.head
             imis_insuree.extension.append(extension)
 
         def build_extention_registrationDate(imis_insuree, fhir_patient):
-            #import pdb; pdb.set_trace()
-
+            if not hasattr(fhir_patient,'validity_from'):
+                return
+            
             extension = Extension()
             extension.url = "http://hispindia.org/fhir/StructureDefinition/registrationDate"
             #extension.valueDateTime = fhir_patient.validity_from
             extension.valueString = fhir_patient.validity_from
 
             imis_insuree.extension.append(extension)
+            
         build_extention_isHead(imis_insuree, fhir_patient)
         build_extention_registrationDate(imis_insuree, fhir_patient)
