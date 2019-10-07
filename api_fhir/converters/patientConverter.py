@@ -230,7 +230,7 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
     def build_fhir_extentions(cls, imis_insuree, fhir_patient):
         imis_insuree.extension = []
 
-        def build_extention_isHead( imis_insuree, fhir_patient):
+        def build_extension_isHead( imis_insuree, fhir_patient):
             if not hasattr(fhir_patient,'head'):
                 return
             
@@ -239,7 +239,7 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
             extension.valueBoolean = fhir_patient.head
             imis_insuree.extension.append(extension)
 
-        def build_extention_registrationDate(imis_insuree, fhir_patient):
+        def build_extension_registrationDate(imis_insuree, fhir_patient):
             if not hasattr(fhir_patient,'validity_from'):
                 return
             
@@ -250,5 +250,5 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
 
             imis_insuree.extension.append(extension)
             
-        build_extention_isHead(imis_insuree, fhir_patient)
-        build_extention_registrationDate(imis_insuree, fhir_patient)
+        build_extension_isHead(imis_insuree, fhir_patient)
+        build_extension_registrationDate(imis_insuree, fhir_patient)
