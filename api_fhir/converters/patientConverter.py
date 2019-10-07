@@ -3,7 +3,7 @@ from insuree.models import Insuree, Gender
 
 from api_fhir.configurations import Stu3IdentifierConfig, GeneralConfiguration, Stu3MaritalConfig
 from api_fhir.converters import BaseFHIRConverter, PersonConverterMixin, ReferenceConverterMixin
-from api_fhir.models import Patient, AdministrativeGender, ImisMaritalStatus
+from api_fhir.models import Patient, AdministrativeGender, ImisMaritalStatus, Extension
 
 from api_fhir.models.address import AddressUse, AddressType
 from api_fhir.utils import TimeUtils, DbManagerUtils
@@ -23,6 +23,8 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
         cls.build_fhir_marital_status(fhir_patient, imis_insuree)
         cls.build_fhir_telecom(fhir_patient, imis_insuree)
         cls.build_fhir_addresses(fhir_patient, imis_insuree)
+        cls.build_fhir_extentions(fhir_patient, imis_insuree)
+
         return fhir_patient
 
     @classmethod
@@ -223,3 +225,26 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
                     imis_insuree.current_address = address.text
                 elif address.type == AddressType.BOTH.value:
                     imis_insuree.geolocation = address.text
+
+    @classmethod
+    def build_fhir_extentions(cls, imis_insuree, fhir_patient):
+        imis_insuree.extension = []
+        #import pdb; pdb.set_trace()
+
+        def build_extention_isHead( imis_insuree, fhir_patient):
+            extension = Extension()
+            extension.url = "http://hispindia.org/fhir/StructureDefinition/isHead"
+            extension.valueBoolean = fhir_patient.head
+            imis_insuree.extension.append(extension)
+
+        def build_extention_registrationDate(imis_insuree, fhir_patient):
+            #import pdb; pdb.set_trace()
+
+            extension = Extension()
+            extension.url = "http://hispindia.org/fhir/StructureDefinition/registrationDate"
+            #extension.valueDateTime = fhir_patient.validity_from
+            extension.valueString = fhir_patient.validity_from
+
+            imis_insuree.extension.append(extension)
+        build_extention_isHead(imis_insuree, fhir_patient)
+        build_extention_registrationDate(imis_insuree, fhir_patient)
