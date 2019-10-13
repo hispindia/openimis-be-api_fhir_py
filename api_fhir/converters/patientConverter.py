@@ -8,6 +8,8 @@ from api_fhir.models import Patient, AdministrativeGender, ImisMaritalStatus, Ex
 from api_fhir.models.address import AddressUse, AddressType
 from api_fhir.utils import TimeUtils, DbManagerUtils
 
+from django.db import connection
+
 
 class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConverterMixin):
 
@@ -249,6 +251,27 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
             extension.valueString = fhir_patient.validity_from
 
             imis_insuree.extension.append(extension)
+
+        def getLocationIDFromFamilyID(family_id):
+            with connection.cursor() as cursor:
+
+                 cursor.execute("""SELECT LocationCode 
+                                   FROM tblFamilies 
+                                   INNER JOIN tblLocations on tblLocations.LocationId = tblFamilies.LocationId
+                                   WHERE FamilyID = """+str(family_id))
+
+                 row = cursor.fetchone()
+            return row
+        
+        def build_extension_Location(imis_insuree, fhir_patient):
+
+             locationCode = getLocationIDFromFamilyID(fhir_patient.family_id)
+             extension = Extension()
+             extension.url = "http://hispindia.org/fhir/StructureDefinition/PatientLocation"
+             extension.valueString = locationCode[0]
+
+             imis_insuree.extension.append(extension)
             
         build_extension_isHead(imis_insuree, fhir_patient)
         build_extension_registrationDate(imis_insuree, fhir_patient)
+        build_extension_Location(imis_insuree, fhir_patient)
