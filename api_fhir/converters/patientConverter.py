@@ -24,9 +24,14 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
         cls.build_fhir_gender(fhir_patient, imis_insuree)
         cls.build_fhir_marital_status(fhir_patient, imis_insuree)
         cls.build_fhir_telecom(fhir_patient, imis_insuree)
+        # addresses
         cls.build_fhir_addresses(fhir_patient, imis_insuree)
+        # extension
         cls.build_fhir_extensions(fhir_patient, imis_insuree)
-
+        # education
+        # cls.build_fhir_education(fhir_patient, imis_insuree)
+        # profession
+        # cls.build_fhir_profession(fhir_patient, imis_insuree)
         return fhir_patient
 
     @classmethod
@@ -275,3 +280,41 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
         build_extension_isHead(imis_insuree, fhir_patient)
         build_extension_registrationDate(imis_insuree, fhir_patient)
         build_extension_Location(imis_insuree, fhir_patient)
+
+    # @classmethod
+    # def build_fhir_education(cls, fhir_patient, imis_insuree):
+    #     education = []
+    #     if imis_insuree.education is not None:
+    #         education = cls.build_fhir_education(imis_insuree.education, )
+    #         education.append(education)
+    #     if imis_insuree.geolocation is not None:
+    #         geolocation = cls.build_fhir_address(imis_insuree.geolocation, AddressUse.HOME.value,
+    #                                              AddressType.BOTH.value)
+    #         education.append(geolocation)
+    #     fhir_patient.address = education
+
+    # @classmethod
+    # def build_fhir_test(cls, fhir_patient, imis_insuree):
+    #     addresses = []
+    #     if imis_insuree.current_address is not None:
+    #         current_address = cls.build_fhir_address(imis_insuree.current_address, AddressUse.HOME.value,
+    #                                                  AddressType.PHYSICAL.value)
+    #         addresses.append(current_address)
+    #     if imis_insuree.geolocation is not None:
+    #         geolocation = cls.build_fhir_address(imis_insuree.geolocation, AddressUse.HOME.value,
+    #                                              AddressType.BOTH.value)
+    #         addresses.append(geolocation)
+    #     fhir_patient.address = addresses
+
+    # @classmethod
+    # def build_fhir_profession(cls, fhir_patient, imis_insuree):
+    #     profession = []
+    #     if imis_insuree.profession is not None:
+    #         profession = cls.build_fhir_address(imis_insuree.profession, AddressUse.HOME.value,
+    #                                                  AddressType.PHYSICAL.value)
+    #         profession.append(profession)
+    #     if imis_insuree.geolocation is not None:
+    #         geolocation = cls.build_fhir_address(imis_insuree.geolocation, AddressUse.HOME.value,
+    #                                              AddressType.BOTH.value)
+    #         profession.append(geolocation)
+    #     fhir_patient.address = profession

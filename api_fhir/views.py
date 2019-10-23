@@ -28,7 +28,7 @@ class BaseFHIRView(APIView):
 
 
 class InsureeViewSet(BaseFHIRView, viewsets.ModelViewSet):
-    queryset = Insuree.objects.all()
+    queryset = Insuree.objects.all().filter(validity_to__exact=None) 
     serializer_class = PatientSerializer
 
 
