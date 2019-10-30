@@ -4,6 +4,20 @@ from api_fhir.models import Element, Property
 class Extension(Element):
 
     url = Property('url', str)
+    # policy status
+    valuePolicystatus = Property('valuePolicystatus', str)
+    # insuree policy id
+    valueInsureePolicyID = Property('valueInsureePolicyID', str)
+    # policy id
+    valuePolicyID = Property('valuePolicyID', str)
+    # Enrollment date
+    valueEnrollmentDate = Property('valueEnrollmentDate', str)
+    # start date
+    valueStartDate = Property('valueStartDate', str)
+    # effective date
+    valueEffectiveDate = Property('valueEffectiveDate', str)
+    # Expiry date
+    valueExpiryDate = Property('valueExpiryDate', str)
     # education
     valueEducation = Property('valueEducation', str)
     # profession

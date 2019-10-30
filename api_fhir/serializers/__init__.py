@@ -37,11 +37,11 @@ class BaseFHIRSerializer(serializers.Serializer):
 
 
 from api_fhir.serializers.patientSerializer import PatientSerializer
+from api_fhir.serializers.policySerializer import PolicySerializer
 from api_fhir.serializers.locationSerializer import LocationSerializer
 from api_fhir.serializers.practitionerRoleSerializer import PractitionerRoleSerializer
 from api_fhir.serializers.practitionerSerializer import PractitionerSerializer
 from api_fhir.serializers.claimSerializer import ClaimSerializer
 from api_fhir.serializers.eligibilityRequestSerializer import EligibilityRequestSerializer
-from api_fhir.serializers.policyEligibilityRequestSerializer import PolicyEligibilityRequestSerializer
 from api_fhir.serializers.claimResponseSerializer import ClaimResponseSerializer
 from api_fhir.serializers.communicationRequestSerializer import CommunicationRequestSerializer

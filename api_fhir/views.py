@@ -1,5 +1,5 @@
 from claim.models import ClaimAdmin, Claim, Feedback
-from insuree.models import Insuree
+from insuree.models import Insuree, InsureePolicy
 from location.models import HealthFacility
 
 from rest_framework import viewsets, mixins
@@ -11,8 +11,8 @@ from api_fhir.paginations import FhirBundleResultsSetPagination
 from api_fhir.permissions import FHIRApiPermissions
 from api_fhir.configurations import Stu3EligibilityConfiguration as Config
 from api_fhir.serializers import PatientSerializer, LocationSerializer, PractitionerRoleSerializer, \
-    PractitionerSerializer, ClaimSerializer, EligibilityRequestSerializer, PolicyEligibilityRequestSerializer, \
-    ClaimResponseSerializer, CommunicationRequestSerializer
+    PractitionerSerializer, ClaimSerializer, EligibilityRequestSerializer, \
+    ClaimResponseSerializer, CommunicationRequestSerializer, PolicySerializer
 
 
 class CsrfExemptSessionAuthentication(SessionAuthentication):
@@ -72,3 +72,9 @@ class CommunicationRequestViewSet(BaseFHIRView, mixins.RetrieveModelMixin, mixin
 class EligibilityRequestViewSet(BaseFHIRView, mixins.CreateModelMixin, GenericViewSet):
     queryset = Insuree.objects.none()
     serializer_class = eval(Config.get_serializer())
+
+# policy
+class PolicyViewSet(BaseFHIRView, viewsets.ModelViewSet):
+    
+    queryset = InsureePolicy.objects.all().filter(validity_to__exact=None)
+    serializer_class = PolicySerializer

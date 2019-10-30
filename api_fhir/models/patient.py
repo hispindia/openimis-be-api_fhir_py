@@ -33,10 +33,6 @@ class PatientLink(BackboneElement):
 
 class Patient(DomainResource):
 
-    # education
-    education = Property('education', str)
-    # profession
-    profession = Property('profession','Profession', count_max='*')
     identifier = Property('identifier', 'Identifier', count_max='*')
     active = Property('active', bool)
     name = Property('name', 'HumanName', count_max='*')
