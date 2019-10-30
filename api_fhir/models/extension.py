@@ -4,6 +4,10 @@ from api_fhir.models import Element, Property
 class Extension(Element):
 
     url = Property('url', str)
+    # education
+    valueEducation = Property('valueEducation', str)
+    # profession
+    valueProfession = Property('valueProfession', str)
     valueAddress = Property('valueAddress', 'Address')
     valueAge = Property('valueAge', 'Age')
     valueAnnotation = Property('valueAnnotation', 'Annotation')

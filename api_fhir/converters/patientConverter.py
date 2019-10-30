@@ -7,15 +7,12 @@ from api_fhir.models import Patient, AdministrativeGender, ImisMaritalStatus, Ex
 
 from api_fhir.models.address import AddressUse, AddressType
 from api_fhir.utils import TimeUtils, DbManagerUtils
-
 from django.db import connection
-
 
 class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConverterMixin):
 
     @classmethod
     def to_fhir_obj(cls, imis_insuree):
-
         fhir_patient = Patient()
         cls.build_fhir_pk(fhir_patient, imis_insuree.id)
         cls.build_human_names(fhir_patient, imis_insuree)
@@ -28,10 +25,6 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
         cls.build_fhir_addresses(fhir_patient, imis_insuree)
         # extension
         cls.build_fhir_extensions(fhir_patient, imis_insuree)
-        # education
-        # cls.build_fhir_education(fhir_patient, imis_insuree)
-        # profession
-        # cls.build_fhir_profession(fhir_patient, imis_insuree)
         return fhir_patient
 
     @classmethod
@@ -259,62 +252,56 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
 
         def getLocationIDFromFamilyID(family_id):
             with connection.cursor() as cursor:
-
                  cursor.execute("""SELECT LocationCode 
                                    FROM tblFamilies 
                                    INNER JOIN tblLocations on tblLocations.LocationId = tblFamilies.LocationId
                                    WHERE FamilyID = """+str(family_id))
+                 row = cursor.fetchone()
+            return row
+        
+        def getProfessionFromID(ID):
+            with connection.cursor() as cursor:
+                 cursor.execute("""SELECT tblProfessions.Profession 
+                                    FROM tblInsuree 
+                                    FULL OUTER JOIN tblProfessions ON tblInsuree.Profession = tblProfessions.ProfessionId 
+                                    WHERE tblInsuree.InsureeID = """+str(ID))
+                 row = cursor.fetchone()
+            return row
 
+        def getEducationFromID(ID):
+            with connection.cursor() as cursor:
+                 cursor.execute("""SELECT tblEducations.Education 
+                                    FROM tblInsuree FULL OUTER JOIN tblEducations 
+                                    ON tblInsuree.Education = tblEducations.EducationId 
+                                    WHERE tblInsuree.InsureeID = """+str(ID))
                  row = cursor.fetchone()
             return row
         
         def build_extension_Location(imis_insuree, fhir_patient):
-
              locationCode = getLocationIDFromFamilyID(fhir_patient.family_id)
              extension = Extension()
              extension.url = "http://hispindia.org/fhir/StructureDefinition/PatientLocation"
              extension.valueString = locationCode[0]
+             imis_insuree.extension.append(extension)
 
+        # education
+        def build_extension_Education(imis_insuree, fhir_patient):
+             locationCode = getEducationFromID(fhir_patient.id)
+             extension = Extension()
+             extension.url = "http://hispindia.org/fhir/StructureDefinition/PatientEducation"
+             extension.valueEducation = locationCode[0]
+             imis_insuree.extension.append(extension)
+
+        # profession
+        def build_extension_Profession(imis_insuree, fhir_patient):
+             locationCode = getProfessionFromID(fhir_patient.id)
+             extension = Extension()
+             extension.url = "http://hispindia.org/fhir/StructureDefinition/PatientProfession"
+             extension.valueProfession = locationCode[0]
              imis_insuree.extension.append(extension)
             
         build_extension_isHead(imis_insuree, fhir_patient)
         build_extension_registrationDate(imis_insuree, fhir_patient)
         build_extension_Location(imis_insuree, fhir_patient)
-
-    # @classmethod
-    # def build_fhir_education(cls, fhir_patient, imis_insuree):
-    #     education = []
-    #     if imis_insuree.education is not None:
-    #         education = cls.build_fhir_education(imis_insuree.education, )
-    #         education.append(education)
-    #     if imis_insuree.geolocation is not None:
-    #         geolocation = cls.build_fhir_address(imis_insuree.geolocation, AddressUse.HOME.value,
-    #                                              AddressType.BOTH.value)
-    #         education.append(geolocation)
-    #     fhir_patient.address = education
-
-    # @classmethod
-    # def build_fhir_test(cls, fhir_patient, imis_insuree):
-    #     addresses = []
-    #     if imis_insuree.current_address is not None:
-    #         current_address = cls.build_fhir_address(imis_insuree.current_address, AddressUse.HOME.value,
-    #                                                  AddressType.PHYSICAL.value)
-    #         addresses.append(current_address)
-    #     if imis_insuree.geolocation is not None:
-    #         geolocation = cls.build_fhir_address(imis_insuree.geolocation, AddressUse.HOME.value,
-    #                                              AddressType.BOTH.value)
-    #         addresses.append(geolocation)
-    #     fhir_patient.address = addresses
-
-    # @classmethod
-    # def build_fhir_profession(cls, fhir_patient, imis_insuree):
-    #     profession = []
-    #     if imis_insuree.profession is not None:
-    #         profession = cls.build_fhir_address(imis_insuree.profession, AddressUse.HOME.value,
-    #                                                  AddressType.PHYSICAL.value)
-    #         profession.append(profession)
-    #     if imis_insuree.geolocation is not None:
-    #         geolocation = cls.build_fhir_address(imis_insuree.geolocation, AddressUse.HOME.value,
-    #                                              AddressType.BOTH.value)
-    #         profession.append(geolocation)
-    #     fhir_patient.address = profession
+        build_extension_Education(imis_insuree, fhir_patient)
+        build_extension_Profession(imis_insuree, fhir_patient)
