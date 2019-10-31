@@ -27,43 +27,78 @@ class PolicyConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConverte
                  row = cursor.fetchone()
             return row
 
+        def getPolicyStageFromID(ID):
+            with connection.cursor() as cursor:
+                 cursor.execute("""SELECT tblPolicy.PolicyStage 
+                                    FROM tblInsureePolicy 
+                                    FULL OUTER JOIN tblPolicy on tblInsureePolicy.PolicyId = tblPolicy.PolicyID  
+                                    WHERE tblInsureePolicy.InsureePolicyId = """+str(ID))
+                 row = cursor.fetchone()
+            return row
+
+        def getPolicyProductFromID(ID):
+            with connection.cursor() as cursor:
+                 cursor.execute("""SELECT tblProduct.ProductCode 
+                                    FROM tblInsureePolicy 
+                                    FULL OUTER JOIN tblPolicy on tblInsureePolicy.PolicyId = tblPolicy.PolicyID 
+                                    FULL OUTER JOIN tblProduct on tblPolicy.ProdID = tblProduct.ProdID                 
+                                    WHERE tblInsureePolicy.InsureePolicyId = """+str(ID))
+                 row = cursor.fetchone()
+            return row
+        
         # policy status
         def build_extension_PolicyStatus(imis_insuree, fhir_patient): 
              PolicyStatus = getPolicyStatusFromID(fhir_patient.id)
              extension = Extension()
-             extension.url = "http://hispindia.org/fhir/StructureDefinition/PatientPolicyStatus/" + str(PolicyStatus[0])
-             extension.valuePolicystatus = PolicyStatus[0]
+             extension.url = "http://hispindia.org/fhir/StructureDefinition/PatientPolicyStatus"
+             extension.valueString = PolicyStatus[0]
              imis_insuree.extension.append(extension)
 
+         # policy stage
+        def build_extension_PolicyStage(imis_insuree, fhir_patient): 
+             PolicyStage = getPolicyStageFromID(fhir_patient.id)
+             extension = Extension()
+             extension.url = "http://hispindia.org/fhir/StructureDefinition/PatientPolicyStage/" 
+             extension.valueString = PolicyStage[0]
+             imis_insuree.extension.append(extension)
+
+          # policy product
+        def build_extension_PolicyProduct(imis_insuree, fhir_patient): 
+             PolicyProduct = getPolicyProductFromID(fhir_patient.id)
+             extension = Extension()
+             extension.url = "http://hispindia.org/fhir/StructureDefinition/PatientPolicyProduct/" 
+             extension.valueString = PolicyProduct[0]
+             imis_insuree.extension.append(extension)
+             
         # policy insuree policy id
         def build_extension_InsureePolicyID(imis_insuree, fhir_patient):
              InsureePolicyID = fhir_patient.insuree_id
              extension = Extension()
-             extension.url = "http://hispindia.org/fhir/StructureDefinition/PatientPolicyInsureeID/"+str(InsureePolicyID)
-             extension.valueInsureePolicyID = InsureePolicyID
+             extension.url = "http://hispindia.org/fhir/StructureDefinition/PatientPolicyInsureeID"
+             extension.valueString = InsureePolicyID
              imis_insuree.extension.append(extension)
 
         # policy id
         def build_extension_PolicyID(imis_insuree, fhir_patient): 
              PolicyID = fhir_patient.policy_id
              extension = Extension()
-             extension.url = "http://hispindia.org/fhir/StructureDefinition/PatientPolicyID/" +str(PolicyID)
-             extension.valuePolicyID = PolicyID
+             extension.url = "http://hispindia.org/fhir/StructureDefinition/PatientPolicyID"
+             extension.valueString = PolicyID
              imis_insuree.extension.append(extension)
 
         # Enrollment date
         def build_extension_EnrollmentDate(imis_insuree, fhir_patient): 
              EnrollmentDate = fhir_patient.enrollment_date
              extension = Extension()
-             extension.url = "http://hispindia.org/fhir/StructureDefinition/PatientEnrollmentDate/" +str(EnrollmentDate)
-             extension.valueEnrollmentDate = EnrollmentDate
+             extension.url = "http://hispindia.org/fhir/StructureDefinition/PatientEnrollmentDate"
+             extension.valueString = EnrollmentDate
              imis_insuree.extension.append(extension)
 
         # start date
         def build_extension_StartDate(imis_insuree, fhir_patient): 
              StartDate = fhir_patient.start_date
              extension = Extension()
-             extension.url = "http://hispindia.org/fhir/StructureDefinition/PatientStartDate/" +str(StartDate)
+             extension.url = "http://hispindia.org/fhir/StructureDefinition/PatientStartDate" 
              extension.valueStartDate = StartDate
              imis_insuree.extension.append(extension)
 
@@ -71,19 +106,21 @@ class PolicyConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConverte
         def build_extension_EffectiveDate(imis_insuree, fhir_patient): 
              EffectiveDate = fhir_patient.effective_date
              extension = Extension()
-             extension.url = "http://hispindia.org/fhir/StructureDefinition/PatientEffectiveDate/" +str(EffectiveDate)
-             extension.valueEffectiveDate = EffectiveDate
+             extension.url = "http://hispindia.org/fhir/StructureDefinition/PatientEffectiveDate" 
+             extension.valueString = EffectiveDate
              imis_insuree.extension.append(extension)
 
         # Expiry date
         def build_extension_ExpiryDate(imis_insuree, fhir_patient): 
              ExpiryDate = fhir_patient.expiry_date
              extension = Extension()
-             extension.url = "http://hispindia.org/fhir/StructureDefinition/PatientExpiryDate/" +str(ExpiryDate)
-             extension.valueExpiryDate = ExpiryDate
+             extension.url = "http://hispindia.org/fhir/StructureDefinition/PatientExpiryDate"
+             extension.valueString = ExpiryDate
              imis_insuree.extension.append(extension)
             
         build_extension_PolicyStatus(imis_insuree, fhir_patient)
+        build_extension_PolicyStage(imis_insuree, fhir_patient)
+        build_extension_PolicyProduct(imis_insuree, fhir_patient)
         build_extension_InsureePolicyID(imis_insuree, fhir_patient)
         build_extension_PolicyID(imis_insuree, fhir_patient)
         build_extension_EnrollmentDate(imis_insuree, fhir_patient)
