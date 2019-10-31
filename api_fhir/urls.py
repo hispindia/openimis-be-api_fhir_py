@@ -13,6 +13,12 @@ router.register(r'CommunicationRequest', views.CommunicationRequestViewSet)
 router.register(r'EligibilityRequest', views.EligibilityRequestViewSet, base_name='EligibilityRequest')
 # policy
 router.register(r'InsureePolicy', views.PolicyViewSet)
+# claim data
+router.register(r'ClaimData', views.ClaimDataViewSet)
+# claim items
+router.register(r'ClaimItems', views.ClaimItemViewSet)
+# claim services
+router.register(r'ClaimServices', views.ClaimServiceViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

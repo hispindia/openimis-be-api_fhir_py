@@ -164,3 +164,8 @@ class Claim(DomainResource):
     hospitalization = Property('hospitalization', 'Period')
     item = Property('item', 'ClaimItem', count_max='*')
     total = Property('total', 'Money')
+
+class ClaimService(DomainResource):
+
+    identifier = Property('identifier', 'Identifier', count_max='*')
+    active = Property('active', bool)

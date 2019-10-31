@@ -109,6 +109,9 @@ from api_fhir.converters.referenceConverterMixin import ReferenceConverterMixin
 from api_fhir.converters.contractConverter import ContractConverter
 from api_fhir.converters.patientConverter import PatientConverter
 from api_fhir.converters.policyConverter import PolicyConverter
+from api_fhir.converters.claimdataConverter import ClaimDataConverter
+from api_fhir.converters.claimserviceConverter import ClaimServiceConverter
+from api_fhir.converters.claimitemConverter import ClaimItemConverter
 from api_fhir.converters.locationConverter import LocationConverter
 from api_fhir.converters.operationOutcomeConverter import OperationOutcomeConverter
 from api_fhir.converters.practitionerConverter import PractitionerConverter

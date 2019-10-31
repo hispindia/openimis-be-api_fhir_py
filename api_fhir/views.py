@@ -1,4 +1,4 @@
-from claim.models import ClaimAdmin, Claim, Feedback
+from claim.models import ClaimAdmin, Claim, Feedback, ClaimItem, ClaimService
 from insuree.models import Insuree, InsureePolicy
 from location.models import HealthFacility
 
@@ -12,7 +12,8 @@ from api_fhir.permissions import FHIRApiPermissions
 from api_fhir.configurations import Stu3EligibilityConfiguration as Config
 from api_fhir.serializers import PatientSerializer, LocationSerializer, PractitionerRoleSerializer, \
     PractitionerSerializer, ClaimSerializer, EligibilityRequestSerializer, \
-    ClaimResponseSerializer, CommunicationRequestSerializer, PolicySerializer
+    ClaimResponseSerializer, CommunicationRequestSerializer, PolicySerializer, \
+    ClaimDataSerializer, ClaimItemSerializer, ClaimServiceSerializer
 
 
 class CsrfExemptSessionAuthentication(SessionAuthentication):
@@ -75,6 +76,20 @@ class EligibilityRequestViewSet(BaseFHIRView, mixins.CreateModelMixin, GenericVi
 
 # policy
 class PolicyViewSet(BaseFHIRView, viewsets.ModelViewSet):
-    
     queryset = InsureePolicy.objects.all().filter(validity_to__exact=None)
     serializer_class = PolicySerializer
+
+# claim data
+class ClaimDataViewSet(BaseFHIRView, viewsets.ModelViewSet):
+    queryset = Claim.objects.all().filter(validity_to__exact=None)
+    serializer_class = ClaimDataSerializer
+
+# claim items
+class ClaimItemViewSet(BaseFHIRView, viewsets.ModelViewSet):
+    queryset = ClaimItem.objects.all().filter(validity_to__exact=None)
+    serializer_class = ClaimItemSerializer
+
+# claim services
+class ClaimServiceViewSet(BaseFHIRView, viewsets.ModelViewSet):
+    queryset = ClaimService.objects.all().filter(validity_to__exact=None)
+    serializer_class = ClaimServiceSerializer
