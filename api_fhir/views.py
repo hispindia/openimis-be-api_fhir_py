@@ -15,7 +15,6 @@ from api_fhir.serializers import PatientSerializer, LocationSerializer, Practiti
     ClaimResponseSerializer, CommunicationRequestSerializer, PolicySerializer, \
     ClaimDataSerializer, ClaimItemSerializer, ClaimServiceSerializer
 
-
 class CsrfExemptSessionAuthentication(SessionAuthentication):
 
     def enforce_csrf(self, request):
@@ -29,7 +28,8 @@ class BaseFHIRView(APIView):
 
 
 class InsureeViewSet(BaseFHIRView, viewsets.ModelViewSet):
-    queryset = Insuree.objects.all().filter(validity_to__exact=None) 
+    insureeid = Claim.objects.all().filter(date_claimed__gte='2019-01-01').values('insuree')
+    queryset = Insuree.objects.all().filter(validity_to__exact=None).filter(id__in=insureeid)
     serializer_class = PatientSerializer
 
 
@@ -76,20 +76,23 @@ class EligibilityRequestViewSet(BaseFHIRView, mixins.CreateModelMixin, GenericVi
 
 # policy
 class PolicyViewSet(BaseFHIRView, viewsets.ModelViewSet):
-    queryset = InsureePolicy.objects.all().filter(validity_to__exact=None)
+    insureeid = Claim.objects.all().filter(date_claimed__gte='2019-01-01').values('insuree')
+    queryset = InsureePolicy.objects.all().filter(validity_to__exact=None).filter(id__in=insureeid)
     serializer_class = PolicySerializer
 
 # claim data
 class ClaimDataViewSet(BaseFHIRView, viewsets.ModelViewSet):
-    queryset = Claim.objects.all().filter(validity_to__exact=None)
+    queryset = Claim.objects.all().filter(validity_to__exact=None).filter(date_claimed__gte='2019-01-01')
     serializer_class = ClaimDataSerializer
 
 # claim items
 class ClaimItemViewSet(BaseFHIRView, viewsets.ModelViewSet):
-    queryset = ClaimItem.objects.all().filter(validity_to__exact=None)
+    claimid = Claim.objects.all().filter(date_claimed__gte='2019-01-01').values('insuree')
+    queryset = ClaimItem.objects.all().filter(validity_to__exact=None).filter(claim__in=claimid)
     serializer_class = ClaimItemSerializer
 
 # claim services
 class ClaimServiceViewSet(BaseFHIRView, viewsets.ModelViewSet):
-    queryset = ClaimService.objects.all().filter(validity_to__exact=None)
+    claimid = Claim.objects.all().filter(date_claimed__gte='2019-01-01').values('insuree')
+    queryset = ClaimService.objects.all().filter(validity_to__exact=None).filter(claim__in=claimid)
     serializer_class = ClaimServiceSerializer
