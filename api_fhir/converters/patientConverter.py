@@ -234,16 +234,16 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
         def build_extension(fhir_patient, imis_insuree,value):
             extension = Extension()
             if value == "head":
-                extension.url = "https://openimis.atlassian.net/wiki/spaces/OP/pages/960069653/FHIR+extension+isHead"
+                extension.url = "https://openimis.atlassian.net/wiki/spaces/OP/pages/960069653/isHead"
                 extension.valueBoolean = imis_insuree.head
             elif value == "validity_from":
-                extension.url = "https://openimis.atlassian.net/wiki/spaces/OP/pages/960331779/FHIR+extension+registrationDate"
+                extension.url = "https://openimis.atlassian.net/wiki/spaces/OP/pages/960331779/registrationDate"
                 if imis_insuree.validity_from is  None:
                     extension.valueString = ""
                 else :
                     extension.valueString = imis_insuree.validity_from
             elif value == "family.location.code":
-                extension.url = "https://openimis.atlassian.net/wiki/spaces/OP/pages/960495619/FHIR+extension+Location"
+                extension.url = "https://openimis.atlassian.net/wiki/spaces/OP/pages/960495619/locationCode"
                 if hasattr(imis_insuree, "family") and imis_insuree.family is not None:
                     if imis_insuree.family.location.code is not None:
                         extension.valueString = imis_insuree.family.location.code
@@ -253,7 +253,7 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
                      extension.valueString = ""
 
             elif value == "education.education":
-                extension.url = "https://openimis.atlassian.net/wiki/spaces/OP/pages/960331788/FHIR+extension+Education"
+                extension.url = "https://openimis.atlassian.net/wiki/spaces/OP/pages/960331788/educationCode"
                 if hasattr(imis_insuree, "education") and imis_insuree.education is not None:
                     if imis_insuree.education.education is not None:
                         extension.valueString = imis_insuree.education.education
@@ -262,7 +262,7 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
                 else:
                      extension.valueString = ""        
             else :
-                extension.url = "https://openimis.atlassian.net/wiki/spaces/OP/pages/960135203/FHIE+extension+Profession"
+                extension.url = "https://openimis.atlassian.net/wiki/spaces/OP/pages/960135203/professionCode"
                 if hasattr(imis_insuree, "profession") and imis_insuree.profession is not None:
                     if imis_insuree.profession.profession is not None:
                         extension.valueString = imis_insuree.profession.profession
