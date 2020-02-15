@@ -125,8 +125,8 @@ class CoverageConventer(BaseFHIRConverter):
 
     @classmethod
     def __build_insuree_extension(cls, fhir_coverage, imis_coverage):
-        ext_insuree = Extension()
-        ext_insuree.url = "Insuree"
+        extension = Extension()
+        extension.url = "Insuree"
         queryset = Insuree.objects.filter(validity_to__isnull=True).filter(family_id = imis_coverage.family.id)
         valueString = ""
         count = 1
@@ -135,8 +135,8 @@ class CoverageConventer(BaseFHIRConverter):
             if count < len(queryset):
                 valueString = (valueString + ";")
             count = count + 1
-        ext_insuree.valueString = valueString
-        fhir_coverage.extension.append(ext_insuree)
+        extension.valueString = valueString
+        fhir_coverage.extension.append(extension)
 
     @classmethod
     def __build_stage_extension(cls, fhir_coverage, imis_coverage):

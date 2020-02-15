@@ -117,3 +117,20 @@ class CoverageRequestQuerySet(BaseFHIRView, mixins.RetrieveModelMixin, mixins.Li
     lookup_field = 'uuid'
     queryset = Policy.objects.all()
     serializer_class = CoverageSerializer
+
+    def list(self, request, *args, **kwargs):
+        refDate = request.GET.get('refDate')
+        if refDate != None:
+            day,month,year = refDate.split('-')
+            isValidDate = True
+            try :
+                datetime.datetime(int(year),int(month),int(day))
+            except ValueError :
+                isValidDate = False
+            datevar = refDate
+            queryset = Policy.objects.filter(validity_to__isnull=True).filter(validity_from__gte=datevar)
+        else:
+            queryset = Policy.objects.filter(validity_to__isnull=True)
+        
+        serializer = CoverageSerializer(self.paginate_queryset(queryset), many=True)
+        return self.get_paginated_response(serializer.data)
