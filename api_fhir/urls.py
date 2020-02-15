@@ -14,5 +14,5 @@ router.register(r'EligibilityRequest', views.EligibilityRequestViewSet, basename
 router.register(r'Coverage', views.CoverageRequestQuerySet)
 
 urlpatterns = [
-    path('', include(router.urls)),
-]
+    path('', include(router.urls))
+    ]
