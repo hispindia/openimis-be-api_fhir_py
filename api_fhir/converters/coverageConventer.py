@@ -131,7 +131,7 @@ class CoverageConventer(BaseFHIRConverter):
         valueString = ""
         count = 1
         for insuree in queryset:
-            valueString = (valueString + insuree.uuid)
+            valueString = (valueString + insuree.uuid + ":" + insuree.family.location.code)
             if count < len(queryset):
                 valueString = (valueString + ";")
             count = count + 1

@@ -94,11 +94,45 @@ class ClaimViewSet(BaseFHIRView, mixins.RetrieveModelMixin, mixins.ListModelMixi
     queryset = Claim.objects.all()
     serializer_class = ClaimSerializer
 
+    def list(self, request, *args, **kwargs):
+        refDate = request.GET.get('refDate')
+        if refDate != None:
+            day,month,year = refDate.split('-')
+            isValidDate = True
+            try :
+                datetime.datetime(int(year),int(month),int(day))
+            except ValueError :
+                isValidDate = False
+            datevar = refDate
+            queryset = Claim.objects.filter(validity_to__isnull=True).filter(validity_from__gte=datevar)
+        else:
+            queryset = Claim.objects.filter(validity_to__isnull=True)
+        
+        serializer = ClaimSerializer(self.paginate_queryset(queryset), many=True)
+        return self.get_paginated_response(serializer.data)
+
 
 class ClaimResponseViewSet(BaseFHIRView, mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericViewSet):
     lookup_field = 'uuid'
     queryset = Claim.objects.all()
     serializer_class = ClaimResponseSerializer
+
+    def list(self, request, *args, **kwargs):
+        refDate = request.GET.get('refDate')
+        if refDate != None:
+            day,month,year = refDate.split('-')
+            isValidDate = True
+            try :
+                datetime.datetime(int(year),int(month),int(day))
+            except ValueError :
+                isValidDate = False
+            datevar = refDate
+            queryset = Claim.objects.filter(validity_to__isnull=True).filter(validity_from__gte=datevar)
+        else:
+            queryset = Claim.objects.filter(validity_to__isnull=True)
+        
+        serializer = ClaimResponseSerializer(self.paginate_queryset(queryset), many=True)
+        return self.get_paginated_response(serializer.data)
 
 
 class CommunicationRequestViewSet(BaseFHIRView, mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericViewSet):
