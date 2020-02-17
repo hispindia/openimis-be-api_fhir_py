@@ -1,6 +1,8 @@
 from claim.models import ClaimAdmin, Claim, Feedback
 from insuree.models import Insuree
 from location.models import HealthFacility
+from policy.models import Policy
+from product.models import Product
 
 from rest_framework import viewsets, mixins
 from rest_framework.authentication import SessionAuthentication
@@ -14,6 +16,7 @@ from api_fhir.configurations import Stu3EligibilityConfiguration as Config
 from api_fhir.serializers import PatientSerializer, LocationSerializer, PractitionerRoleSerializer, \
     PractitionerSerializer, ClaimSerializer, EligibilityRequestSerializer, PolicyEligibilityRequestSerializer, \
     ClaimResponseSerializer, CommunicationRequestSerializer
+from api_fhir.serializers.coverageSerializer import CoverageSerializer
 
 
 class CsrfExemptSessionAuthentication(SessionAuthentication):
@@ -91,11 +94,45 @@ class ClaimViewSet(BaseFHIRView, mixins.RetrieveModelMixin, mixins.ListModelMixi
     queryset = Claim.objects.all()
     serializer_class = ClaimSerializer
 
+    def list(self, request, *args, **kwargs):
+        refDate = request.GET.get('refDate')
+        if refDate != None:
+            day,month,year = refDate.split('-')
+            isValidDate = True
+            try :
+                datetime.datetime(int(year),int(month),int(day))
+            except ValueError :
+                isValidDate = False
+            datevar = refDate
+            queryset = Claim.objects.filter(validity_to__isnull=True).filter(validity_from__gte=datevar)
+        else:
+            queryset = Claim.objects.filter(validity_to__isnull=True)
+        
+        serializer = ClaimSerializer(self.paginate_queryset(queryset), many=True)
+        return self.get_paginated_response(serializer.data)
+
 
 class ClaimResponseViewSet(BaseFHIRView, mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericViewSet):
     lookup_field = 'uuid'
     queryset = Claim.objects.all()
     serializer_class = ClaimResponseSerializer
+
+    def list(self, request, *args, **kwargs):
+        refDate = request.GET.get('refDate')
+        if refDate != None:
+            day,month,year = refDate.split('-')
+            isValidDate = True
+            try :
+                datetime.datetime(int(year),int(month),int(day))
+            except ValueError :
+                isValidDate = False
+            datevar = refDate
+            queryset = Claim.objects.filter(validity_to__isnull=True).filter(validity_from__gte=datevar)
+        else:
+            queryset = Claim.objects.filter(validity_to__isnull=True)
+        
+        serializer = ClaimResponseSerializer(self.paginate_queryset(queryset), many=True)
+        return self.get_paginated_response(serializer.data)
 
 
 class CommunicationRequestViewSet(BaseFHIRView, mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericViewSet):
@@ -107,3 +144,26 @@ class CommunicationRequestViewSet(BaseFHIRView, mixins.RetrieveModelMixin, mixin
 class EligibilityRequestViewSet(BaseFHIRView, mixins.CreateModelMixin, GenericViewSet):
     queryset = Insuree.objects.none()
     serializer_class = eval(Config.get_serializer())
+
+
+class CoverageRequestQuerySet(BaseFHIRView, mixins.RetrieveModelMixin, mixins.ListModelMixin, GenericViewSet):
+    lookup_field = 'uuid'
+    queryset = Policy.objects.all()
+    serializer_class = CoverageSerializer
+
+    def list(self, request, *args, **kwargs):
+        refDate = request.GET.get('refDate')
+        if refDate != None:
+            day,month,year = refDate.split('-')
+            isValidDate = True
+            try :
+                datetime.datetime(int(year),int(month),int(day))
+            except ValueError :
+                isValidDate = False
+            datevar = refDate
+            queryset = Policy.objects.filter(validity_to__isnull=True).filter(validity_from__gte=datevar)
+        else:
+            queryset = Policy.objects.filter(validity_to__isnull=True)
+        
+        serializer = CoverageSerializer(self.paginate_queryset(queryset), many=True)
+        return self.get_paginated_response(serializer.data)
