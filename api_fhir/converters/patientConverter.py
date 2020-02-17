@@ -1,6 +1,7 @@
 from django.utils.translation import gettext
 from insuree.models import Insuree, Gender, Education, Profession, Family
 from location.models import Location
+from policy.models import Policy
 
 from api_fhir.configurations import Stu3IdentifierConfig, GeneralConfiguration, Stu3MaritalConfig
 from api_fhir.converters import BaseFHIRConverter, PersonConverterMixin, ReferenceConverterMixin
@@ -227,7 +228,7 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
     def build_fhir_extentions(cls, fhir_patient, imis_insuree):
         fhir_patient.extension = []
         
-        def build_extension(fhir_patient, imis_insuree,value):
+        def build_extension(fhir_patient, imis_insuree, value):
             extension = Extension()
             if value == "head":
                 extension.url = "https://openimis.atlassian.net/wiki/spaces/OP/pages/960069653/isHead"
@@ -247,7 +248,6 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
                         extension.valueString = ""
                 else:
                      extension.valueString = ""
-
             elif value == "education.education":
                 extension.url = "https://openimis.atlassian.net/wiki/spaces/OP/pages/960331788/educationCode"
                 if hasattr(imis_insuree, "education") and imis_insuree.education is not None:
@@ -256,7 +256,17 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
                     else :
                         extension.valueString = ""
                 else:
-                     extension.valueString = ""        
+                     extension.valueString = ""
+            elif value == "policy.policy":
+                extension.url = "Policy"
+                queryset = Policy.objects.filter(validity_to__isnull=True).filter(family_id = imis_insuree.family_id)
+                valueString = ""
+                count = 1
+                for policy in queryset:
+                    valueString = (valueString + policy.uuid)
+                    if count < len(queryset):
+                        valueString = (valueString + ";")
+                extension.valueString = valueString        
             else :
                 extension.url = "https://openimis.atlassian.net/wiki/spaces/OP/pages/960135203/professionCode"
                 if hasattr(imis_insuree, "profession") and imis_insuree.profession is not None:
@@ -268,8 +278,10 @@ class PatientConverter(BaseFHIRConverter, PersonConverterMixin, ReferenceConvert
                      extension.valueString = ""
 
             fhir_patient.extension.append(extension)
-        build_extension(fhir_patient, imis_insuree,"head")
-        build_extension(fhir_patient, imis_insuree,"validity_from")
-        build_extension(fhir_patient, imis_insuree,"family.location.code")
-        build_extension(fhir_patient, imis_insuree,"education.education")
-        build_extension(fhir_patient, imis_insuree,"profession.profession")
+            
+        build_extension(fhir_patient, imis_insuree, "head")
+        build_extension(fhir_patient, imis_insuree, "validity_from")
+        build_extension(fhir_patient, imis_insuree, "family.location.code")
+        build_extension(fhir_patient, imis_insuree, "education.education")
+        build_extension(fhir_patient, imis_insuree, "profession.profession")
+        build_extension(fhir_patient, imis_insuree, "policy.policy")
