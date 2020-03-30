@@ -117,3 +117,4 @@ from api_fhir.converters.eligibilityRequestConverter import EligibilityRequestCo
 from api_fhir.converters.policyEligibilityRequestConverter import PolicyEligibilityRequestConverter
 from api_fhir.converters.communicationRequestConverter import CommunicationRequestConverter
 from api_fhir.converters.claimResponseConverter import ClaimResponseConverter
+from api_fhir.converters.organisationConverter import OrganisationConverter

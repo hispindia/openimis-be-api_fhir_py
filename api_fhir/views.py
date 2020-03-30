@@ -1,6 +1,6 @@
 from claim.models import ClaimAdmin, Claim, Feedback
 from insuree.models import Insuree
-from location.models import HealthFacility
+from location.models import HealthFacility, Location
 from policy.models import Policy
 from product.models import Product
 
@@ -17,6 +17,7 @@ from api_fhir.serializers import PatientSerializer, LocationSerializer, Practiti
     PractitionerSerializer, ClaimSerializer, EligibilityRequestSerializer, PolicyEligibilityRequestSerializer, \
     ClaimResponseSerializer, CommunicationRequestSerializer
 from api_fhir.serializers.coverageSerializer import CoverageSerializer
+from api_fhir.serializers.organisationSerializer import OrganisationSerializer
 
 
 class CsrfExemptSessionAuthentication(SessionAuthentication):
@@ -167,3 +168,8 @@ class CoverageRequestQuerySet(BaseFHIRView, mixins.RetrieveModelMixin, mixins.Li
         
         serializer = CoverageSerializer(self.paginate_queryset(queryset), many=True)
         return self.get_paginated_response(serializer.data)
+
+class OrganisationViewSet(BaseFHIRView, viewsets.ModelViewSet):
+    lookup_field = 'uuid'
+    queryset = Location.objects.all()
+    serializer_class = OrganisationSerializer
