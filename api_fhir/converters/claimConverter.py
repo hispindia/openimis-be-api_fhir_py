@@ -10,7 +10,6 @@ from api_fhir.models import Claim as FHIRClaim, ClaimItem as FHIRClaimItem, Peri
     ImisClaimIcdTypes, ClaimInformation, Quantity
 from api_fhir.utils import TimeUtils, FhirUtils, DbManagerUtils
 from api_fhir.models.extension import Extension
-from django.core.serializers import json
 
 
 class ClaimConverter(BaseFHIRConverter, ReferenceConverterMixin):
@@ -471,7 +470,9 @@ class ClaimConverter(BaseFHIRConverter, ReferenceConverterMixin):
 
         for service in services:
             extension = Extension()
-            extension.url = "service_id="+str(service.service_id)
+            extension.url = "service_id=" + \
+                str(service.service_id)+",service_code=" + \
+                str(service.service.code)
             extension.valueString = "deductableAmount=" + \
                 str(service.deductable_amount) + ",exceedCeilingAmount=" + \
                 str(service.exceed_ceiling_amount)
