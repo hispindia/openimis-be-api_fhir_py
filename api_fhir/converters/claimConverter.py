@@ -456,7 +456,9 @@ class ClaimConverter(BaseFHIRConverter, ReferenceConverterMixin):
 
         for item in items:
             extension = Extension()
-            extension.url = "item_id="+str(item.item_id)
+            extension.url = "item_id=" + \
+                str(item.item_id)+",item_code=" + \
+                str(item.item.code)
             extension.valueString = "deductableAmount=" + \
                 str(item.deductable_amount) + ",exceedCeilingAmount=" + \
                 str(item.exceed_ceiling_amount)
