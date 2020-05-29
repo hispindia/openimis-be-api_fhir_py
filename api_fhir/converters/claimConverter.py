@@ -412,70 +412,87 @@ class ClaimConverter(BaseFHIRConverter, ReferenceConverterMixin):
 
     @classmethod
     def build_fhir_claim_extension(cls, fhir_claim, imis_claim):
-        cls.__build_remunerated_amount_extension(fhir_claim, imis_claim)
-        cls.__build_valuated_amount_extension(fhir_claim, imis_claim)
-        cls.__build_validity_from_extension(fhir_claim, imis_claim)
-        cls.__build_validity_to_extension(fhir_claim, imis_claim)
-        cls.__build_claim_items_extension(fhir_claim, imis_claim)
-        cls.__build_claim_services_extension(fhir_claim, imis_claim)
+        cls.__build_claim_remunerated_amount_extension(fhir_claim, imis_claim)
+        cls.__build_claim_valuated_amount_extension(fhir_claim, imis_claim)
+        cls.__build_claim_validity_from_extension(fhir_claim, imis_claim)
+        cls.__build_claim_validity_to_extension(fhir_claim, imis_claim)
+        cls.__build_items_deductible_amount_extension(fhir_claim, imis_claim)
+        cls.__build_items_exceed_ceiling_amount_extension(
+            fhir_claim, imis_claim)
+        cls.__build_services_deductible_amount_extension(
+            fhir_claim, imis_claim)
+        cls.__build_services_exceed_ceiling_amount_extension(
+            fhir_claim, imis_claim)
         return fhir_claim
 
     @classmethod
-    def __build_remunerated_amount_extension(cls, fhir_claim, imis_claim):
+    def __build_claim_remunerated_amount_extension(cls, fhir_claim, imis_claim):
         extension = Extension()
-        extension.url = "Remnumerated Amount"
-        extension.valueString = imis_claim.remunerated if imis_claim.remunerated else ""
+        extension.url = "https://openimis.atlassian.net/wiki/spaces/OP/pages/1409122319/remuneratedAmount"
+        extension.valueString = str(imis_claim.remunerated)
         fhir_claim.extension.append(extension)
 
     @classmethod
-    def __build_valuated_amount_extension(cls, fhir_claim, imis_claim):
+    def __build_claim_valuated_amount_extension(cls, fhir_claim, imis_claim):
         extension = Extension()
-        extension.url = "Valuated Amount"
-        extension.valueString = imis_claim.valuated if imis_claim.valuated else ""
+        extension.url = "https://openimis.atlassian.net/wiki/spaces/OP/pages/1409056782/valuatedAmount"
+        extension.valueString = str(imis_claim.valuated)
         fhir_claim.extension.append(extension)
 
     @classmethod
-    def __build_validity_from_extension(cls, fhir_claim, imis_claim):
+    def __build_claim_validity_from_extension(cls, fhir_claim, imis_claim):
         extension = Extension()
-        extension.url = "Validity From"
-        extension.valueString = imis_claim.validity_from if imis_claim.validity_from else ""
+        extension.url = "https://openimis.atlassian.net/wiki/spaces/OP/pages/1408925728/validityFrom"
+        extension.valueString = str(imis_claim.validity_from)
         fhir_claim.extension.append(extension)
 
     @classmethod
-    def __build_validity_to_extension(cls, fhir_claim, imis_claim):
+    def __build_claim_validity_to_extension(cls, fhir_claim, imis_claim):
         extension = Extension()
-        extension.url = "Validity To"
-        extension.valueString = imis_claim.validity_to if imis_claim.validity_to else ""
+        extension.url = "https://openimis.atlassian.net/wiki/spaces/OP/pages/1409417248/validityTo"
+        extension.valueString = str(imis_claim.validity_to)
         fhir_claim.extension.append(extension)
 
     @classmethod
-    def __build_claim_items_extension(cls, fhir_claim, imis_claim):
+    def __build_items_deductible_amount_extension(cls, fhir_claim, imis_claim):
         items = []
-        if imis_claim and imis_claim.id:
-            items = ClaimItem.objects.filter(claim_id=imis_claim.id)
-
+        items = ClaimItem.objects.filter(claim_id=imis_claim.id)
         for item in items:
             extension = Extension()
-            extension.url = "item_id=" + \
-                str(item.item_id)+",item_code=" + \
-                str(item.item.code)
-            extension.valueString = "deductableAmount=" + \
-                str(item.deductable_amount) + ",exceedCeilingAmount=" + \
-                str(item.exceed_ceiling_amount)
+            extension.url = "itemCode=" + \
+                str(item.item.code) + "https://openimis.atlassian.net/wiki/spaces/OP/pages/1408991264/deductibleAmountItem"
+            extension.valueString = str(item.deductable_amount)
             fhir_claim.extension.append(extension)
 
     @classmethod
-    def __build_claim_services_extension(cls, fhir_claim, imis_claim):
-        services = []
-        if imis_claim and imis_claim.id:
-            services = ClaimService.objects.filter(claim_id=imis_claim.id)
+    def __build_items_exceed_ceiling_amount_extension(cls, fhir_claim, imis_claim):
+        items = []
+        items = ClaimItem.objects.filter(claim_id=imis_claim.id)
+        for item in items:
+            extension = Extension()
+            extension.url = "itemCode=" + \
+                str(item.item.code) + ",https://openimis.atlassian.net/wiki/spaces/OP/pages/1409024033/exceedCeilingAmountItem"
+            extension.valueString = str(item.exceed_ceiling_amount)
+            fhir_claim.extension.append(extension)
 
+    @classmethod
+    def __build_services_deductible_amount_extension(cls, fhir_claim, imis_claim):
+        services = []
+        services = ClaimService.objects.filter(claim_id=imis_claim.id)
         for service in services:
             extension = Extension()
-            extension.url = "service_id=" + \
-                str(service.service_id)+",service_code=" + \
-                str(service.service.code)
-            extension.valueString = "deductableAmount=" + \
-                str(service.deductable_amount) + ",exceedCeilingAmount=" + \
-                str(service.exceed_ceiling_amount)
+            extension.url = "serviceCode=" + \
+                str(service.service.code) + ",https://openimis.atlassian.net/wiki/spaces/OP/pages/1409155101/deductibleAmountServices"
+            extension.valueString = str(service.deductable_amount)
+            fhir_claim.extension.append(extension)
+
+    @classmethod
+    def __build_services_exceed_ceiling_amount_extension(cls, fhir_claim, imis_claim):
+        services = []
+        services = ClaimService.objects.filter(claim_id=imis_claim.id)
+        for service in services:
+            extension = Extension()
+            extension.url = "serviceCode=" + \
+                str(service.service.code) + ",https://openimis.atlassian.net/wiki/spaces/OP/pages/1409089578/exceedCeilingAmountService"
+            extension.valueString = str(service.exceed_ceiling_amount)
             fhir_claim.extension.append(extension)
